@@ -1,10 +1,8 @@
 # TraitSemanticAnalysis
 
-The file account.cdm.json.out has suggested traits for attributes inside the applicationCommon/Account entity as an example. While it is still not perfect, thanks to NLP processing some of the traits are easily discovered such as for the example for the aging30 attribute:
+The file account.cdm.json.out has suggested traits for attributes inside the applicationCommon/Account entity as an example. While it is still not perfect, thanks to NLP processing some of the traits are easily discovered such as for the aging30 attribute:
 
--------
-aging30
--------
+**aging30**
 means.demographic.age
 means.measurement.age
 
