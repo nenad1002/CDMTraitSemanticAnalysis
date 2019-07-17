@@ -10,8 +10,8 @@ where it find the common root of words age and aging.
 
 Work that will be done during hackathon:
 - Find a way to reduce noise
-- Find a way to incoporate description into the equation (content of the is.localized.described as and is.localized.displayedAs trait) by executing POS and named entity recognition on top of it
-- Rank traits for suggestion based on how important they appear
+- Find a way to incoporate description into the equation (content of the is.localized.described as and is.localized.displayedAs trait) by executing POS and named entity recognition on top of it, also checking hypernym-hyponym relationship might be useful
+- Rank traits for suggestions based on how important they appear
 - Build better UX for users
 - Find a way to resolve entities with Python to have a full set of attributes
 - Anything else that might be interesting to do or anaylize.
