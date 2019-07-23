@@ -1,0 +1,198 @@
+{
+    "data" : [
+    {
+        "attribute": "accountId",
+        "description": "Unique identifier of the account.",
+        "traits": [
+            "means.idea.account",
+            "means.identity",
+            "means.identity.entityId",
+            "is.identifiedBy"
+        ]
+    },
+    {
+        "attribute": "accountCategoryCode",
+        "description": "Select a category to indicate whether the customer account is standard or preferred.",
+        "traits": [
+            "means.idea.account",
+            "means.category",
+            "means.measurement.code"
+        ]
+    },
+    {
+        "attribute": "customerSizeCode",
+        "description": "Select the size category or range of the account for segmentation and reporting purposes.",
+        "traits": [
+            "means.idea.customer",
+            "means.measurement.size",
+            "means.measurement.code",
+            "means.measurement.range",
+            "means.category"
+        ]
+    },
+    {
+        "attribute": "preferredContactMethodCode",
+        "description": "Select the preferred method of contact.",
+        "traits": [
+            "means.idea.person.contact",
+            "means.measurement.code"
+        ]
+    },
+    {
+        "attribute": "customerTypeCode",
+        "description": "Select the category that best describes the relationship between the account and your organization.",
+        "traits": [
+            "means.idea.customer",
+            "means.measurement.rate.type",
+            "means.measurement.code",
+            "means.category"
+        ]
+    },
+    {
+        "attribute": "accountRatingCode",
+        "description": "Select a rating to indicate the value of the customer account.",
+        "traits": [
+            "means.idea.account",
+            "means.measurement.rate",
+            "means.measurement.code"
+        ]
+    },
+    {
+        "attribute": "industryCode",
+        "description": "Select the account's primary industry for use in marketing segmentation and demographic analysis.",
+        "traits": [
+            "means.measurement.code"
+        ]
+    },
+    {
+        "attribute": "name",
+        "description": "Type the company or business name.",
+        "traits": [
+            "means.identity.name",
+            "means.identity.company.name",
+            "is.named",
+            "is.linkedEntity.name"
+        ]
+    },
+    {
+        "attribute": "accountNumber",
+        "description": "Type an ID number or code for the account to quickly search and identify the account in system views.",
+        "traits": [
+            "means.idea.account",
+            "means.identity",
+            "means.identity.entityId",
+            "is.identifiedBy",
+            "means.measurement.code"
+        ]
+    },
+    {
+        "attribute": "revenue",
+        "description": "Type the annual revenue for the account, used as an indicator in financial performance analysis. ",
+        "traits": []
+    },
+    {
+        "attribute": "numberOfEmployees",
+        "description": "Type the number of employees that work at the account for use in marketing segmentation and demographic analysis.",
+        "traits": [
+            "means.idea.person.employee"
+        ]
+    },
+    {
+        "attribute": "description",
+        "description": "Type additional information to describe the account, such as an excerpt from the company's website.",
+        "traits": [
+            "means.reference.description"
+        ]
+    },
+    {
+        "attribute": "ownershipCode",
+        "description": "Select the account's ownership structure, such as public or private.",
+        "traits": [
+            "means.idea.account",
+            "means.measurement.percent.ownership",
+            "means.measurement.code"
+        ]
+    },
+    {
+        "attribute": "stockExchange",
+        "description": "Type the stock exchange at which the account is listed to track their stock and financial performance of the company.",
+        "traits": [
+            "means.idea.account"
+        ]
+    },
+    {
+        "attribute": "webSiteUrl",
+        "description": "Type the account's website URL to get quick details about the company profile.",
+        "traits": [
+            "means.idea.account",
+            "means.reference.URL"
+        ]
+    },
+    {
+        "attribute": "EMailAddress1",
+        "description": "Type the primary email address for the account.",
+        "traits": [
+            "means.identity.service.email"
+        ]
+    },
+    {
+        "attribute": "doNotPostalMail",
+        "description": "Select whether the account allows direct mail. If Do Not Allow is selected, the account will be excluded from letter activities distributed in marketing campaigns.",
+        "traits": []
+    },
+    {
+        "attribute": "parentAccountId",
+        "description": "Choose the parent account associated with this account to show parent and child businesses in reporting and analytics.",
+        "traits": [
+            "means.idea.account",
+            "means.relationship.parent",
+            "means.identity",
+            "means.identity.entityId",
+            "is.identifiedBy"
+        ]
+    },
+    {
+        "attribute": "aging30",
+        "description": "For system use only.",
+        "traits": [
+            "means.demographic.age",
+            "means.measurement.age"
+        ]
+    },
+    {
+        "attribute": "preferredAppointmentDayCode",
+        "description": "Select the preferred day of the week for service appointments.",
+        "traits": [
+            "means.calendar.day",
+            "means.measurement.duration.days",
+            "means.measurement.code",
+            "means.calendar.dayOfWeek"
+        ]
+    },
+    {
+        "attribute": "preferredAppointmentTimeCode",
+        "description": "Select the preferred time of day for service appointments.",
+        "traits": [
+            "means.measurement.time",
+            "is.dataFormat.time",
+            "means.measurement.code"
+        ]
+    },
+    {
+        "attribute": "exchangeRate",
+        "description": "Shows the conversion rate of the record's currency. The exchange rate is used to convert all money fields in the record from the local currency to the system's default currency. ",
+        "traits": [
+            "means.measurement.rate"
+        ]
+    },
+    {
+        "attribute": "entityImageId",
+        "description": "For internal use only. ",
+        "traits": [
+            "means.reference.URL.image",
+            "means.content.binary.image",
+            "means.identity"
+        ]
+    }
+]
+}

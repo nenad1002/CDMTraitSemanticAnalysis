@@ -12,7 +12,16 @@ def extract_attributes(files_to_open):
             for attribute in data['definitions'][0]['hasAttributes'][0]['attributeGroupReference']['members']:
                 if 'name' in attribute:
                     attribute_name = attribute.get('name')
-                    attributes.append(attribute_name)
+                    description = ''
+                    if 'appliedTraits' in attribute:
+                        for trait in attribute['appliedTraits']:
+                            if 'traitReference' in trait:
+                                trait_name = trait.get('traitReference')
+                                if trait_name == 'is.localized.describedAs':
+                                    description = trait['arguments'][0]['entityReference']['constantValues'][0][1]
+
+                    print ((attribute_name, description))
+                    attributes.append((attribute_name, description))
 
     return attributes
 
