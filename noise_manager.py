@@ -12,7 +12,7 @@ def find_commonly_occured_noise(traits):
     # TODO: Find a way to remove trait features that might only appear once.
     trait_features_count = {}
     for trait in traits:
-        print (trait)
+        #print (trait)
         for i in range(len(trait[1]) - 1, -1, -1):
             if i == len(trait[1]) - 1:
                 continue

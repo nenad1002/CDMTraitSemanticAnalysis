@@ -39,7 +39,7 @@ def lemma_and_stem_traits(stemmer, lemmatizer, trait_list):
             #new_stems = lemma_and_stem_trait_helper(trait, i)
             new_stems = [stem]
             obj = {'1' : trait, '2': new_stems}
-            print (obj)
+            #print (obj)
             if i == len(trait[1]) - 1 or not noise_manager.is_generating_too_much_noise(trait[1][i]):
                 result.append(obj)
 

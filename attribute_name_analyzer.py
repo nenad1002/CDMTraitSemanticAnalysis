@@ -10,10 +10,6 @@ def lemma_and_stem_attribute(stemmer, lemmatizer, attribute):
     features_list = nlp_utility.convert_to_lower_case(features_list)
     feature_words = nlp_utility.remove_stop_words(features_list)
 
-    print ("feature list")
-    print (features_list)
-
-
     result = []
     for word in feature_words:
         lemma = lemmatizer.lemmatize(word)

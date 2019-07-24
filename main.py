@@ -55,16 +55,25 @@ def analyze_attributes_in_entities(paths, expected_traits = None):
         else:
             sentence_feature = []
 
+        print()
+        print("------- attribute -------")
+        print(attribute[0])
+        print('------- traits -------')
+
         # Connect attribute and sentence features and remove duplicates.
         stem_feature = list(dict.fromkeys(stem_feature + sentence_feature))
 
         result_trait_set = match_traits_to_attribute(stem_feature, stem_traits)
 
+        print (result_trait_set)
+        print ('----------------')
+        print ()
+
         outputDic[attribute[0]] = result_trait_set
 
     if expected_traits is not None:
         benchmark_dict = benchmark_runner.extract_example_data(expected_traits)
-        print(benchmark_dict)
+        #print(benchmark_dict)
         print(benchmark_runner.measure_similarity(outputDic, benchmark_dict))
 
 def analyze_single_attribute(attribute, description):
@@ -78,12 +87,14 @@ def analyze_single_attribute(attribute, description):
     # Connect attribute and sentence features and remove duplicates.
     stem_feature = list(dict.fromkeys(stem_feature + sentence_feature))
     print()
-    print("-------")
-    print(attribute)
-    print('-------')
+    print("------- attribute ------")
+    print(attribute[0])
+    print('------- traits -----------')
 
     result_trait_set = match_traits_to_attribute(stem_feature, stem_traits)
     print (result_trait_set)
+    print ('-------------')
+    print ()
 
 
 def main(whetherToAnalyzeSchema):
