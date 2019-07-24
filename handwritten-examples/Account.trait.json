@@ -29,7 +29,9 @@
             "means.measurement.size",
             "means.measurement.code",
             "means.measurement.range",
-            "means.category"
+            "means.category",
+            "means.idea.account",
+            "means.calendar.reporting"
         ]
     },
     {
@@ -47,7 +49,10 @@
             "means.idea.customer",
             "means.measurement.rate.type",
             "means.measurement.code",
-            "means.category"
+            "means.category",
+            "means.relationship",
+            "means.idea.organization",
+            "means.idea.organization.unit"
         ]
     },
     {
@@ -55,7 +60,9 @@
         "description": "Select a rating to indicate the value of the customer account.",
         "traits": [
             "means.idea.account",
+            "means.idea.customer",
             "means.measurement.rate",
+            "means.measurement.rate.type",
             "means.measurement.code"
         ]
     },
@@ -63,7 +70,8 @@
         "attribute": "industryCode",
         "description": "Select the account's primary industry for use in marketing segmentation and demographic analysis.",
         "traits": [
-            "means.measurement.code"
+            "means.measurement.code",
+            "means.idea.account"
         ]
     },
     {
@@ -103,7 +111,10 @@
         "attribute": "description",
         "description": "Type additional information to describe the account, such as an excerpt from the company's website.",
         "traits": [
-            "means.reference.description"
+            "means.reference.description",
+            "means.idea.account",
+            "means.idea.company",
+            "means.identity.company.name"
         ]
     },
     {
@@ -119,7 +130,9 @@
         "attribute": "stockExchange",
         "description": "Type the stock exchange at which the account is listed to track their stock and financial performance of the company.",
         "traits": [
-            "means.idea.account"
+            "means.idea.account",
+            "means.idea.company",
+            "means.identity.company.name"
         ]
     },
     {

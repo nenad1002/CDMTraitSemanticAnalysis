@@ -12,7 +12,7 @@ def extract_example_data(file):
 
     return example_dict
 
-
+# Measures Jaccard index to measure the similarity between actual and expected set.
 def measure_similarity(original_dict, example_dict):
     diff1 = 0
     diff2 = 0

@@ -1,170 +1,98 @@
-import nltk
-
-nltk.download('averaged_perceptron_tagger')
-
 import benchmark_runner
 import trait_extractor
 import attribute_extractor
-import noise_manager
 from nltk.stem import WordNetLemmatizer
-from nltk.corpus import stopwords
 from nltk.stem import LancasterStemmer, SnowballStemmer
-from nltk.tokenize import word_tokenize, RegexpTokenizer
-from string import punctuation
-from nltk import pos_tag
 from nltk.probability import FreqDist
+import description_analyzer
+import trait_analyzer
+import attribute_name_analyzer
 
-custom_stop_words = set(stopwords.words('english') + list(punctuation))
-
-print (custom_stop_words)
-# print(custom_stop_words)
+ANALYZE_ATTRIBUTES_FROM_SCHEMA = True
 
 # Aggresive stemming preferred.
 # lancester = SnowballStemmer('english')
 lancester = LancasterStemmer()
 
+
+# Use wordnet for lemmas.
 wordnet_lemmatizer = WordNetLemmatizer()
-
-camel_case_tokenizer = RegexpTokenizer('([A-Z]?[a-z]+)')
-
-
-def lemma_and_stem_trait_helper(trait, index):
-    trait_features = camel_case_tokenizer.tokenize(trait[1][index])
-
-    newList = []
-
-    for feature in trait_features:
-        newList.append(feature.lower())
-
-    trait_features = newList
-
-    if trait[0] == 'means.calendar.dayOfWeek':
-        print ('aaaaa', trait_features)
-    feature_words = remove_stop_words(trait_features)
-
-    result = []
-
-    for feature in feature_words:
-        lemma = wordnet_lemmatizer.lemmatize(feature)
-        stem = lancester.stem(lemma)
-        result.append(stem)
-
-    return result
-
-def lemmaAndStemTraits(trait_list):
-    result = []
-    for trait in trait_list:
-        for i in range(len(trait[1]) - 1, -1, -1):
-            lemma = wordnet_lemmatizer.lemmatize((trait[1][i]))
-            stem = lancester.stem(lemma)
-            # If a user wants to break trait words as well.
-            #new_stems = lemma_and_stem_trait_helper(trait, i)
-            new_stems = [stem]
-            obj = {'1' : trait, '2': new_stems}
-            print (obj)
-            if i == len(trait[1]) - 1 or not noise_manager.is_generating_too_much_noise(trait[1][i]):
-                result.append(obj)
-
-    return result
-
-
-def remove_stop_words(sent):
-    for word in sent:
-        if word in custom_stop_words:
-            sent.remove(word)
-    return sent
-
-
-# TODO Will be used for description, still need to figure out how will I weight words in sentences.
-def lemmaAndStemSentence(sent):
-    sentence_words = word_tokenize(sent)
-    pos = pos_tag(sentence_words)
-    sentence_words = remove_stop_words(sentence_words)
-
-    result = []
-    for word in pos:
-        if word[1] == 'NN' or word[1] == 'NNS' or word[1] == 'NNP':
-            stem = lancester.stem(word[0])
-            result.append(stem)
-
-    return result
-
-
-def lemmaAndStemAttribute(features_list):
-    [feature.lower() for feature in features_list]
-    feature_words = remove_stop_words(features_list)
-
-    result = []
-    for word in feature_words:
-        lemma = wordnet_lemmatizer.lemmatize(word)
-        stem = lancester.stem(lemma)
-        result.append(stem)
-
-    return result
 
 
 trait_files = ['meanings.cdm.json', 'foundations.cdm.json', 'primitives.cdm.json']
 
 trait_list = trait_extractor.extract_traits('CDM.SchemaDocuments/', trait_files)
 
-attributes = attribute_extractor.extract_attributes(['CDM.SchemaDocuments/core/applicationCommon/Account.cdm.json'])
+stem_traits = trait_analyzer.lemma_and_stem_traits(lancester, wordnet_lemmatizer, trait_list)
 
-camel_case_tokenizer = RegexpTokenizer('([A-Z]?[a-z]+)')
 
-noise_manager.find_commonly_occured_noise(trait_list)
+def match_traits_to_attribute(attribute_features, trait_features):
+    result_trait_list = []
+    for tfeature in trait_features:
+        if len(tfeature['2']) == 0:
+            continue
+        expected_count = len(tfeature['2'])
+        actual_count = 0
+        for word in attribute_features:
+            if word in tfeature['2']:
+                actual_count += 1
+            if actual_count == expected_count:
+                result_trait_list.append(tfeature['1'][0])
+                break
 
-stem_traits = lemmaAndStemTraits(trait_list)
+    return set(result_trait_list)
 
-# for ss in wn.synsets('credit'):
-#    for hyper in ss.hypernyms():
-#        print (ss, hyper)
+def analyze_attributes_in_entities(paths, expected_traits = None):
+    attributes = attribute_extractor.extract_attributes(paths)
 
-outputDic = {}
 
-for attribute in attributes:
-    features = camel_case_tokenizer.tokenize(attribute[0])
-    stem_feature = lemmaAndStemAttribute(features)
-    if attribute[1] != '':
-        sentence_feature = lemmaAndStemSentence(attribute[1])
+    outputDic = {}
+
+    for attribute in attributes:
+        stem_feature = attribute_name_analyzer.lemma_and_stem_attribute(lancester, wordnet_lemmatizer, attribute)
+        if attribute[1] != '':
+            sentence_feature = description_analyzer.lemma_and_stem_sentence(lancester, attribute[1])
+        else:
+            sentence_feature = []
+
+        # Connect attribute and sentence features and remove duplicates.
+        stem_feature = list(dict.fromkeys(stem_feature + sentence_feature))
+
+        result_trait_set = match_traits_to_attribute(stem_feature, stem_traits)
+
+        outputDic[attribute[0]] = result_trait_set
+
+    if expected_traits is not None:
+        benchmark_dict = benchmark_runner.extract_example_data(expected_traits)
+        print(benchmark_dict)
+        print(benchmark_runner.measure_similarity(outputDic, benchmark_dict))
+
+def analyze_single_attribute(attribute, description):
+    attribute = [attribute, description]
+    stem_feature = attribute_name_analyzer.lemma_and_stem_attribute(lancester, wordnet_lemmatizer, attribute)
+    if description != '':
+        sentence_feature = description_analyzer.lemma_and_stem_sentence(lancester, attribute[1])
     else:
         sentence_feature = []
 
     # Connect attribute and sentence features and remove duplicates.
     stem_feature = list(dict.fromkeys(stem_feature + sentence_feature))
-
     print()
     print("-------")
     print(attribute)
     print('-------')
-    outputTraitList = []
-    for word2 in stem_traits:
-        if len(word2['2']) == 0:
-            continue
-        expected_count = len(word2['2'])
-        actual_count = 0
-        if word2['1'][0] == 'means.calendar.dayOfWeek':
-            print ('means.calendar.dayOfWeek', attribute[0], stem_feature)
-        for word in stem_feature:
-            if word in word2['2']:
-                actual_count += 1
-            if actual_count == expected_count:
-                outputTraitList.append(word2['1'][0])
-                print(word2['1'][0])
-                print(stem_feature)
-                print("word2", word2['2'], len(word2['2']))
-                break
 
-    outputTraitSet = set(outputTraitList)
-    outputDic[attribute[0]] = outputTraitSet
-
-# print (outputDic)
-
-benchmark_dict = benchmark_runner.extract_example_data('handwritten-examples/Account.trait.json')
-
-print(benchmark_dict)
-
-print(benchmark_runner.measure_similarity(outputDic, benchmark_dict))
-
-print(noise_manager.noise_features)
+    result_trait_set = match_traits_to_attribute(stem_feature, stem_traits)
+    print (result_trait_set)
 
 
+def main(whetherToAnalyzeSchema):
+    if whetherToAnalyzeSchema:
+        analyze_attributes_in_entities(['CDM.SchemaDocuments/core/applicationCommon/Account.cdm.json'], 'handwritten-examples/Account.trait.json')
+    else:
+        attribute = input("Enter attribute name: ")
+        description = input("Enter description: ")
+        analyze_single_attribute(attribute, description)
+
+if __name__ == "__main__":
+    main(ANALYZE_ATTRIBUTES_FROM_SCHEMA)
