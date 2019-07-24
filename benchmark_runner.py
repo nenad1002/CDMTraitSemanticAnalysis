@@ -23,11 +23,19 @@ def measure_similarity(original_dict, example_dict):
         if output_att in example_dict:
             original_set = original_dict[output_att]
             example_set = example_dict[output_att]
-            diff1 += len(original_set.difference(example_set))
+            print (original_set)
+            print (example_set)
+            diff1 += len(original_set.intersection(example_set))
             diff2 += len(example_set.difference(original_set))
+            print (diff1)
+            print (diff2)
             total1 += len(original_set)
             total2 += len(example_set)
 
-    overlap_index = (total1 + total2 - (diff1 + diff2)) / (2 * (min(total1, total2)))
+    intersect = diff1
+    union = total1 + total2 - intersect
+    print (intersect)
+    print (union)
+    jaccard_index = intersect / union
 
-    return overlap_index
+    return jaccard_index

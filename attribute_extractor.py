@@ -8,7 +8,6 @@ def extract_attributes(files_to_open):
     for file in files_to_open:
         with open(file) as json_file:
             data = json.load(json_file)
-            print (data)
             for attribute in data['definitions'][0]['hasAttributes'][0]['attributeGroupReference']['members']:
                 if 'name' in attribute:
                     attribute_name = attribute.get('name')
@@ -20,7 +19,6 @@ def extract_attributes(files_to_open):
                                 if trait_name == 'is.localized.describedAs':
                                     description = trait['arguments'][0]['entityReference']['constantValues'][0][1]
 
-                    print ((attribute_name, description))
                     attributes.append((attribute_name, description))
 
     return attributes

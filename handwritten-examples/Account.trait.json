@@ -7,7 +7,8 @@
             "means.idea.account",
             "means.identity",
             "means.identity.entityId",
-            "is.identifiedBy"
+            "is.identifiedBy",
+            "is.linkedEntity.identifier"
         ]
     },
     {
@@ -16,7 +17,8 @@
         "traits": [
             "means.idea.account",
             "means.category",
-            "means.measurement.code"
+            "means.measurement.code",
+            "means.measurement.customer"
         ]
     },
     {
@@ -125,14 +127,17 @@
         "description": "Type the account's website URL to get quick details about the company profile.",
         "traits": [
             "means.idea.account",
-            "means.reference.URL"
+            "means.reference.URL",
+            "means.idea.company"
         ]
     },
     {
         "attribute": "EMailAddress1",
         "description": "Type the primary email address for the account.",
         "traits": [
-            "means.identity.service.email"
+            "means.identity.service.email",
+            "means.idea.account",
+            "means.location.address"
         ]
     },
     {
@@ -166,7 +171,8 @@
             "means.calendar.day",
             "means.measurement.duration.days",
             "means.measurement.code",
-            "means.calendar.dayOfWeek"
+            "means.calendar.dayOfWeek",
+            "means.identity.service"
         ]
     },
     {
@@ -175,14 +181,17 @@
         "traits": [
             "means.measurement.time",
             "is.dataFormat.time",
-            "means.measurement.code"
+            "means.measurement.code",
+            "means.identity.service"
         ]
     },
     {
         "attribute": "exchangeRate",
         "description": "Shows the conversion rate of the record's currency. The exchange rate is used to convert all money fields in the record from the local currency to the system's default currency. ",
         "traits": [
-            "means.measurement.rate"
+            "means.measurement.currency",
+            "means.measurement.rate",
+            "means.measurement.rate.type"
         ]
     },
     {
