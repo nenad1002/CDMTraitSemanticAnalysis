@@ -7,8 +7,7 @@
             "means.idea.account",
             "means.identity",
             "means.identity.entityId",
-            "is.identifiedBy",
-            "is.linkedEntity.identifier"
+            "is.identifiedBy"
         ]
     },
     {
@@ -29,9 +28,7 @@
             "means.measurement.size",
             "means.measurement.code",
             "means.measurement.range",
-            "means.category",
-            "means.idea.account",
-            "means.calendar.reporting"
+            "means.category"
         ]
     },
     {
@@ -50,9 +47,7 @@
             "means.measurement.rate.type",
             "means.measurement.code",
             "means.category",
-            "means.relationship",
-            "means.idea.organization",
-            "means.idea.organization.unit"
+            "means.relationship"
         ]
     },
     {
@@ -60,7 +55,6 @@
         "description": "Select a rating to indicate the value of the customer account.",
         "traits": [
             "means.idea.account",
-            "means.idea.customer",
             "means.measurement.rate",
             "means.measurement.rate.type",
             "means.measurement.code"
@@ -70,8 +64,7 @@
         "attribute": "industryCode",
         "description": "Select the account's primary industry for use in marketing segmentation and demographic analysis.",
         "traits": [
-            "means.measurement.code",
-            "means.idea.account"
+            "means.measurement.code"
         ]
     },
     {
@@ -79,6 +72,7 @@
         "description": "Type the company or business name.",
         "traits": [
             "means.identity.name",
+            "means.identity.company",
             "means.identity.company.name",
             "is.named",
             "is.linkedEntity.name"

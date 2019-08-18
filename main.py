@@ -7,7 +7,10 @@ from nltk.probability import FreqDist
 import description_analyzer
 import trait_analyzer
 import attribute_name_analyzer
+import spacy
 
+# Change this to false if you want to analyze a single attribute,
+# otherwise specify path to the entity you want to analyze.
 ANALYZE_ATTRIBUTES_FROM_SCHEMA = True
 
 # Aggresive stemming preferred.
@@ -51,7 +54,7 @@ def analyze_attributes_in_entities(paths, expected_traits = None):
     for attribute in attributes:
         stem_feature = attribute_name_analyzer.lemma_and_stem_attribute(lancester, wordnet_lemmatizer, attribute)
         if attribute[1] != '':
-            sentence_feature = description_analyzer.lemma_and_stem_sentence(lancester, attribute[1])
+            sentence_feature = description_analyzer.lemma_and_stem_sentence_spacy(lancester, attribute[1], False)
         else:
             sentence_feature = []
 
@@ -73,14 +76,13 @@ def analyze_attributes_in_entities(paths, expected_traits = None):
 
     if expected_traits is not None:
         benchmark_dict = benchmark_runner.extract_example_data(expected_traits)
-        #print(benchmark_dict)
-        print(benchmark_runner.measure_similarity(outputDic, benchmark_dict))
+        print("The Jaccard index of similarity for this example is", benchmark_runner.measure_similarity(outputDic, benchmark_dict))
 
 def analyze_single_attribute(attribute, description):
     attribute = [attribute, description]
     stem_feature = attribute_name_analyzer.lemma_and_stem_attribute(lancester, wordnet_lemmatizer, attribute)
     if description != '':
-        sentence_feature = description_analyzer.lemma_and_stem_sentence(lancester, attribute[1])
+        sentence_feature = description_analyzer.lemma_and_stem_sentence_spacy(lancester, attribute[1], True)
     else:
         sentence_feature = []
 
@@ -95,7 +97,6 @@ def analyze_single_attribute(attribute, description):
     print (result_trait_set)
     print ('-------------')
     print ()
-
 
 def main(whetherToAnalyzeSchema):
     if whetherToAnalyzeSchema:
