@@ -95,15 +95,9 @@ def analyze_single_attribute(attribute, description):
     print ('-------------')
     print ()
 
+from spacy import displacy
+
 def main(whetherToAnalyzeSchema):
-    nlp = spacy.load("en_core_web_lg")
-
-    text = "Account of the customer"
-
-    doc = nlp(text)
-
-    for token in doc:
-        print (token.text, token.tag_, token.dep_)
 
     if whetherToAnalyzeSchema:
         analyze_attributes_in_entities(['CDM.SchemaDocuments/core/applicationCommon/Account.cdm.json'], 'handwritten-examples/Account.trait.json')

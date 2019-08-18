@@ -53,15 +53,18 @@ def find_text_subjects(doc):
     objects = []
     for chunk in doc.noun_chunks:
         # Finding nominal subjects/root or objects.
-        if chunk.root.dep_ == 'nsubj' or chunk.root.dep_ == 'dobj' or chunk.root.dep_ == 'ROOT':
+        if chunk.root.dep_ == 'nsubj' or chunk.root.dep_ == 'dobj' or chunk.root.dep_ == 'ROOT' or chunk.root.dep_ == 'conj':
 
             # Add lemma of a name to the list
             tokens = nlp_utility.remove_stop_words(chunk.text.split())
             for token in tokens:
-                if chunk.root.dep_ == 'nsubj' or chunk.root.dep_ == 'ROOT':
+                if chunk.root.dep_ == 'nsubj' or chunk.root.dep_ == 'ROOT' or (chunk.root.dep_ == 'conj' and chunk.root.head.dep_ == 'nsubj'):
                     subjects.append(token.lower())
-                else:
+                elif chunk.root.dep_ == 'dobj' or (chunk.root.dep_ == 'conj' and chunk.root.head.dep_ == 'dobj'):
                     objects.append(token.lower())
+
+                #if chunk.root.dep_ == 'conj':
+                #    if find_conj_subject(subjects, chunk.root.head.text)
 
     print (subjects)
     print (objects)

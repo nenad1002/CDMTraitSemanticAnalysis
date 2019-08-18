@@ -6,7 +6,6 @@
         "traits": [
             "means.idea.account",
             "means.identity",
-            "means.identity.entityId",
             "is.identifiedBy"
         ]
     },
@@ -84,7 +83,6 @@
         "traits": [
             "means.idea.account",
             "means.identity",
-            "means.identity.entityId",
             "is.identifiedBy",
             "means.measurement.code"
         ]
@@ -106,9 +104,7 @@
         "description": "Type additional information to describe the account, such as an excerpt from the company's website.",
         "traits": [
             "means.reference.description",
-            "means.idea.account",
-            "means.idea.company",
-            "means.identity.company.name"
+            "means.idea.account"
         ]
     },
     {
@@ -124,16 +120,13 @@
         "attribute": "stockExchange",
         "description": "Type the stock exchange at which the account is listed to track their stock and financial performance of the company.",
         "traits": [
-            "means.idea.account",
-            "means.idea.company",
-            "means.identity.company.name"
+
         ]
     },
     {
         "attribute": "webSiteUrl",
         "description": "Type the account's website URL to get quick details about the company profile.",
         "traits": [
-            "means.idea.account",
             "means.reference.URL"
         ]
     },
