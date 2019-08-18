@@ -3,7 +3,7 @@ from nltk import pos_tag
 import nlp_utility
 import spacy
 
-nlp = spacy.load("en_core_web_lg")
+nlp = spacy.load("en_core_web_md")
 
 # Deprecated, use Spacy method instead for both increased precision and speed.
 def lemma_and_stem_sentence(stemmer, sent):
@@ -26,55 +26,55 @@ def lemma_and_stem_sentence_spacy(stemmer, sent, is_noise_preferred):
     # Create a spacy doc
     doc = nlp(text)
 
-    # If we don't want much noise we will need to ignore some nouns and all other words.
-    if is_noise_preferred == False:
-        return find_text_subjects(doc, stemmer)
-    else:
-        subjects = find_text_subjects(doc, stemmer)
-        named_entities = find_named_entity_nounts(doc, stemmer)
-        all_founds = find_all_nouns(doc, stemmer)
+    # We are generating both stemmed and unstemmed words at this point.
+    stemmed_result = []
+    non_stemmed_result = []
 
-        return list(set(subjects).union(set(named_entities).union(set(all_founds))))
+    subjects = find_text_subjects(doc)
+    stemmed_subjects = stem_all_words(subjects, stemmer)
 
-    #result = []
-    #for noun_chunk in doc.noun_chunks:
-    #    print ("noun chunk" + noun_chunk.text.lower())
-    #    stem = stemmer.stem(noun_chunk.text.lower())
-    #    result.append(stem)
+    named_entities = find_named_entity_nouns(doc)
+    stemmed_entities = stem_all_words(named_entities, stemmer)
 
-    #   return result
+    stemmed_result = list(set(stemmed_subjects).union(set(stemmed_entities)))
+    non_stemmed_result = list(set(subjects).union(set(named_entities)))
 
-def find_text_subjects(doc, stemmer):
+    # If we can accept more noise we can go through all of the nouns.
+    if is_noise_preferred:
+        all_nouns = find_all_nouns(doc)
+        stemmed_all_nouns = stem_all_words(all_nouns, stemmer)
+        stemmed_result = list(set(stemmed_result).union(non_stemmed_result))
+        non_stemmed_result = list(set(non_stemmed_result).union(all_nouns))
+
+    return stemmed_result, non_stemmed_result
+
+def find_text_subjects(doc):
     subjects = []
     objects = []
     for chunk in doc.noun_chunks:
-        # Finding nominal subjects.
-        if chunk.root.dep_ == 'nsubj' or chunk.root.dep_ == 'dobj':
+        # Finding nominal subjects/root or objects.
+        if chunk.root.dep_ == 'nsubj' or chunk.root.dep_ == 'dobj' or chunk.root.dep_ == 'ROOT':
 
             # Add lemma of a name to the list
             tokens = nlp_utility.remove_stop_words(chunk.text.split())
             for token in tokens:
-                if chunk.root.dep_ == 'nsubj':
-                    subjects.append(stemmer.stem(token.lower()))
+                if chunk.root.dep_ == 'nsubj' or chunk.root.dep_ == 'ROOT':
+                    subjects.append(token.lower())
                 else:
-                    objects.append(stemmer.stem(token.lower()))
+                    objects.append(token.lower())
 
     print (subjects)
     print (objects)
+
+    # If a sentence doesn't have any subjects or root (very unlikely) find all nouns because all of them might be important.
+    if len(subjects) == 0 and len(objects) == 0:
+        return find_all_nouns(doc)
+
     return subjects if len(subjects) != 0 else objects
 
 
-def find_named_entity_nounts(doc, stemmer):
-    nouns = find_named_entity_nouns_processor(doc)
-    res = []
-    for noun in nouns:
-        res.append(stemmer.stem(noun))
-
-    return res
-
-
 # TODO: Change this function to properly reflect named entities.
-def find_named_entity_nouns_processor(doc):
+def find_named_entity_nouns(doc):
     for ent in doc.ents:
         if ent.label_ == 'ORG':
             return ['organization', 'company']
@@ -89,11 +89,17 @@ def find_named_entity_nouns_processor(doc):
 
     return []
 
-def find_all_nouns(doc, stemmer):
+def find_all_nouns(doc):
     result = []
     for chunk in doc.noun_chunks:
         tokens = nlp_utility.remove_stop_words([chunk.root.text])
         for token in tokens:
-            result.append(stemmer.stem(token.lower()))
+            result.append(token.lower())
 
+    return result
+
+def stem_all_words(word_list, stemmer):
+    result = []
+    for word in word_list:
+        result.append(stemmer.stem(word))
     return result

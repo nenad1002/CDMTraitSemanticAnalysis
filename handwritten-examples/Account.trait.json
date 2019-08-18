@@ -134,8 +134,7 @@
         "description": "Type the account's website URL to get quick details about the company profile.",
         "traits": [
             "means.idea.account",
-            "means.reference.URL",
-            "means.idea.company"
+            "means.reference.URL"
         ]
     },
     {
@@ -158,9 +157,7 @@
         "traits": [
             "means.idea.account",
             "means.relationship.parent",
-            "means.identity",
-            "means.identity.entityId",
-            "is.identifiedBy"
+            "means.identity"
         ]
     },
     {
@@ -178,8 +175,7 @@
             "means.calendar.day",
             "means.measurement.duration.days",
             "means.measurement.code",
-            "means.calendar.dayOfWeek",
-            "means.identity.service"
+            "means.calendar.dayOfWeek"
         ]
     },
     {

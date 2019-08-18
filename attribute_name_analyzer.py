@@ -12,8 +12,8 @@ def lemma_and_stem_attribute(stemmer, lemmatizer, attribute):
 
     result = []
     for word in feature_words:
-        lemma = lemmatizer.lemmatize(word)
-        stem = stemmer.stem(lemma)
+        #lemma = lemmatizer.lemmatize(word)
+        stem = stemmer.stem(word)
         result.append(stem)
 
-    return result
+    return result, feature_words

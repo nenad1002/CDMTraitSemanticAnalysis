@@ -17,8 +17,8 @@ def lemma_and_stem_trait_helper(stemmer, lemmatizer, trait, index):
     result = []
 
     for feature in feature_words:
-        lemma = lemmatizer.lemmatize(feature)
-        stem = stemmer.stem(lemma)
+        #lemma = lemmatizer.lemmatize(feature)
+        stem = stemmer.stem(feature)
         result.append(stem)
 
     return result
@@ -32,13 +32,14 @@ def lemma_and_stem_traits(stemmer, lemmatizer, trait_list):
 
     for trait in trait_list:
         for i in range(len(trait[1]) - 1, -1, -1):
-            lemma = lemmatizer.lemmatize((trait[1][i]))
-            stem = stemmer.stem(lemma)
+            #lemma = lemmatizer.lemmatize((trait[1][i]))
+            stem = stemmer.stem(trait[1][i])
+            non_stemmed_word = trait[1][i]
 
             # If a user wants to break trait words as well.
             #new_stems = lemma_and_stem_trait_helper(trait, i)
             new_stems = [stem]
-            obj = {'1' : trait, '2': new_stems}
+            obj = {'1' : trait, '2': (new_stems, non_stemmed_word)}
             #print (obj)
             if i == len(trait[1]) - 1 or not noise_manager.is_generating_too_much_noise(trait[1][i]):
                 result.append(obj)
