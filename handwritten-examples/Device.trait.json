@@ -3,7 +3,7 @@
     {
         "attribute" : "deviceId",
         "description" : "Unique identifier for entity instances",
-        "traits" : ["means.identity", "means.identity.entityId", "is.identifiedBy"]
+        "traits" : ["means.identity", "means.identity.entityId", "is.identifiedBy", "is.linkedEntity.identifier"]
     },
     {
         "attribute" : "stateCode",
@@ -18,12 +18,12 @@
     {
         "attribute" : "location",
         "description" : "The place where the device can be found." ,
-        "traits" : ["means.location", "is.locatable"]
+        "traits" : ["means.location", "is.locatable", "is.localized"]
     },
     {
         "attribute" : "manufacturer",
         "description" : "A name of the manufacturer.",
-        "traits" : ["means.identity.name"]
+        "traits" : ["means.calendar.manufacturing", "means.identity.name", "means.identity.company.name", "is.named", "is.linkedEntity.name"]
     },
     {
         "attribute" : "manufacturerDate",
@@ -43,12 +43,7 @@
     {
         "attribute" : "patient",
         "description" : "Demographics and other administrative information about an individual or animal receiving care or other health-related services.",
-        "traits" : ["means.demographic"]
-    },
-    {
-        "attribute" : "type",
-        "description" : "Code or identifier to identify a kind of device.",
-        "traits" : ["means.measurement.code", "means.identity", "means.identity.entityId", "is.identifiedBy"]
+        "traits" : ["means.idea.person.contact"]
     },
     {
         "attribute" : "UDI",

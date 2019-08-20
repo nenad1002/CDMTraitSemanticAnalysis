@@ -43,7 +43,6 @@
         "description": "Select the category that best describes the relationship between the account and your organization.",
         "traits": [
             "means.idea.customer",
-            "means.measurement.rate.type",
             "means.measurement.code",
             "means.category",
             "means.relationship"
@@ -134,15 +133,13 @@
         "attribute": "EMailAddress1",
         "description": "Type the primary email address for the account.",
         "traits": [
-            "means.identity.service.email",
-            "means.idea.account",
-            "means.location.address"
+            "means.identity.service.email"
         ]
     },
     {
         "attribute": "doNotPostalMail",
         "description": "Select whether the account allows direct mail. If Do Not Allow is selected, the account will be excluded from letter activities distributed in marketing campaigns.",
-        "traits": []
+        "traits": ["means.idea.account"]
     },
     {
         "attribute": "parentAccountId",
@@ -168,7 +165,9 @@
             "means.calendar.day",
             "means.measurement.duration.days",
             "means.measurement.code",
-            "means.calendar.dayOfWeek"
+            "means.calendar.dayOfWeek",
+            "means.measurement.date",
+            "is.dataFormat.date"
         ]
     },
     {
@@ -177,8 +176,7 @@
         "traits": [
             "means.measurement.time",
             "is.dataFormat.time",
-            "means.measurement.code",
-            "means.identity.service"
+            "means.measurement.code"
         ]
     },
     {

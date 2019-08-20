@@ -1,4 +1,5 @@
 import benchmark_runner
+import nlp_utility
 import trait_extractor
 import attribute_extractor
 from nltk.stem import WordNetLemmatizer
@@ -63,13 +64,17 @@ def analyze_attributes_in_entities(paths, expected_traits = None):
         stemmed_features = list(dict.fromkeys(stemmed_attribute_feature + stemmed_sentence_features))
         unstemmed_features = list(dict.fromkeys(unstemmed_attribute_feature + unstemmed_sentence_features))
 
-        result_trait_set = trait_to_attribute_matcher.match_traits_to_attribute(stemmed_features, stem_traits, unstemmed_features)
+        # We don't want unstemmed features since similarity check could take too long. Change None to unstemmed_features
+        # if similarity check is something that is preferred to do.
+        result_trait_set_from_attribute = trait_to_attribute_matcher.match_traits_to_attribute(stemmed_attribute_feature, stem_traits, None)
+        result_trait_set_from_dict = trait_to_attribute_matcher.match_traits_to_attribute(stemmed_sentence_features, stem_traits, None)
 
-        print (result_trait_set)
+        result_traits = nlp_utility.define_proper_order(result_trait_set_from_attribute, result_trait_set_from_dict)
+        print(result_traits)
         print ('----------------')
         print ()
 
-        outputDic[attribute[0]] = result_trait_set
+        outputDic[attribute[0]] = set(result_traits)
 
     if expected_traits is not None:
         benchmark_dict = benchmark_runner.extract_example_data(expected_traits)
@@ -77,34 +82,52 @@ def analyze_attributes_in_entities(paths, expected_traits = None):
 
 def analyze_single_attribute(attribute, description):
     attribute = [attribute, description]
-    stem_feature = attribute_name_analyzer.lemma_and_stem_attribute(lancester, wordnet_lemmatizer, attribute)
+    attribute_feature = attribute_name_analyzer.lemma_and_stem_attribute(lancester, wordnet_lemmatizer, attribute)
     if description != '':
-        sentence_feature = description_analyzer.lemma_and_stem_sentence_spacy(lancester, attribute[1], False)[0]
+        sentence_features = description_analyzer.lemma_and_stem_sentence_spacy(lancester, attribute[1], False)
     else:
-        sentence_feature = []
+        sentence_features = []
 
-    # Connect attribute and sentence features and remove duplicates.
-    stem_feature = list(dict.fromkeys(stem_feature + sentence_feature))
+    if (len(sentence_features) > 0):
+        stemmed_sentence_features = sentence_features[0]
+        unstemmed_sentence_features = sentence_features[1]
+    else:
+        stemmed_sentence_features = []
+        unstemmed_sentence_features = []
+
+    if len(attribute_feature) > 0:
+        stemmed_attribute_feature = attribute_feature[0]
+        unstemmed_attribute_feature = attribute_feature[1]
+
     print()
     print("------- attribute ------")
     print(attribute[0])
     print('------- traits -----------')
 
-    result_trait_set = trait_to_attribute_matcher.match_traits_to_attribute(stem_feature, stem_traits)
-    print (result_trait_set)
+    result_trait_set_from_attributes = trait_to_attribute_matcher.match_traits_to_attribute(stemmed_attribute_feature, stem_traits,
+                                                                            None)
+    result_trait_set_from_desc = trait_to_attribute_matcher.match_traits_to_attribute(stemmed_sentence_features, stem_traits, None)
+
+    result_traits = nlp_utility.define_proper_order(result_trait_set_from_attributes, result_trait_set_from_desc)
+    print (result_traits)
+
+    #print (result_trait_set_from_desc)
+
+    #result_trait_set_from_attributes = trait_to_attribute_matcher.match_traits_to_attribute(stem_feature, stem_traits)
+    #result_trait_set_from_desc = trait_to_attribute_matcher.match_traits_to_attribute(stem_feature, stem_traits)
+    #print (list(dict.fromkeys(result_trait_set_from_attributes + result_trait_set_from_desc)))
     print ('-------------')
     print ()
-
-from spacy import displacy
 
 def main(whetherToAnalyzeSchema):
 
     if whetherToAnalyzeSchema:
         analyze_attributes_in_entities(['CDM.SchemaDocuments/core/applicationCommon/Account.cdm.json'], 'handwritten-examples/Account.trait.json')
     else:
-        attribute = input("Enter attribute name: ")
-        description = input("Enter description: ")
-        analyze_single_attribute(attribute, description)
+        while (True):
+            attribute = input("Enter attribute name: ")
+            description = input("Enter description: ")
+            analyze_single_attribute(attribute, description)
 
 if __name__ == "__main__":
     main(ANALYZE_ATTRIBUTES_FROM_SCHEMA)

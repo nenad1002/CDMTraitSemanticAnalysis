@@ -20,16 +20,11 @@ def lemma_and_stem_sentence(stemmer, sent):
 
     return result
 
-def lemma_and_stem_sentence_spacy(stemmer, sent, is_noise_preferred):
-    text = (sent)
-
+def lemma_and_stem_sentence_spacy(stemmer, sent, is_noise_preferred, is_single_attribute = False):
     # Create a spacy doc
-    doc = nlp(text)
+    doc = nlp(sent)
 
     # We are generating both stemmed and unstemmed words at this point.
-    stemmed_result = []
-    non_stemmed_result = []
-
     subjects = find_text_subjects(doc)
     stemmed_subjects = stem_all_words(subjects, stemmer)
 
@@ -43,7 +38,7 @@ def lemma_and_stem_sentence_spacy(stemmer, sent, is_noise_preferred):
     if is_noise_preferred:
         all_nouns = find_all_nouns(doc)
         stemmed_all_nouns = stem_all_words(all_nouns, stemmer)
-        stemmed_result = list(set(stemmed_result).union(non_stemmed_result))
+        stemmed_result = list(set(stemmed_result).union(stemmed_all_nouns))
         non_stemmed_result = list(set(non_stemmed_result).union(all_nouns))
 
     return stemmed_result, non_stemmed_result
@@ -52,27 +47,30 @@ def find_text_subjects(doc):
     subjects = []
     objects = []
     for chunk in doc.noun_chunks:
+
+        print (chunk.text, chunk.root.dep_)
         # Finding nominal subjects/root or objects.
         if chunk.root.dep_ == 'nsubj' or chunk.root.dep_ == 'dobj' or chunk.root.dep_ == 'ROOT' or chunk.root.dep_ == 'conj':
 
-            # Add lemma of a name to the list
-            tokens = nlp_utility.remove_stop_words(chunk.text.split())
-            for token in tokens:
-                if chunk.root.dep_ == 'nsubj' or chunk.root.dep_ == 'ROOT' or (chunk.root.dep_ == 'conj' and chunk.root.head.dep_ == 'nsubj'):
-                    subjects.append(token.lower())
+            # This is commented, but could be used if we want to import custom stop words into our code or configs.
+            #tokens = nlp_utility.remove_stop_words(chunk.text.split())
+            for token in nlp(chunk.text):
+                if chunk.root.dep_ == 'nsubj' or chunk.root.dep_ == 'ROOT' or (chunk.root.dep_ == 'conj' and (chunk.root.head.dep_ == 'nsubj' or chunk.root.head.dep_ == 'ROOT')):
+                    if not token.is_stop:
+                        subjects.append(token.text.lower())
                 elif chunk.root.dep_ == 'dobj' or (chunk.root.dep_ == 'conj' and chunk.root.head.dep_ == 'dobj'):
-                    objects.append(token.lower())
+                    if not token.is_stop:
+                        objects.append(token.text.lower())
 
                 #if chunk.root.dep_ == 'conj':
                 #    if find_conj_subject(subjects, chunk.root.head.text)
-
-    print (subjects)
-    print (objects)
 
     # If a sentence doesn't have any subjects or root (very unlikely) find all nouns because all of them might be important.
     if len(subjects) == 0 and len(objects) == 0:
         return find_all_nouns(doc)
 
+    print (subjects)
+    print (objects)
     return subjects if len(subjects) != 0 else objects
 
 
