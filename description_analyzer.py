@@ -14,7 +14,7 @@ class DescriptionAnalyzer:
         self.nlp = spacy.load("en_core_web_sm")
 
 
-    def lemma_and_stem_sentence_spacy(self, stemmer, sent, is_noise_preferred, is_single_attribute = False):
+    def stem_sentences(self, stemmer, sent, is_noise_preferred):
 
         # Create a spacy doc.
         doc = self.nlp(sent)

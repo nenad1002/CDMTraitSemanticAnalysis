@@ -24,12 +24,12 @@ class TraitAnalyzer:
     #        return result
 
 
-    def stem_traits(self, stemmer, lemmatizer, trait_list, noise_manager):
+    def stem_traits(self, trait_list, stemmer, lemmatizer, noise_manager):
         '''
         It does stemming on the traits features.
+        :param trait_list: The trait list.
         :param stemmer: The stemmer.
         :param lemmatizer: The lemmatizer, a user can optionally add code which uses lemmatizer.
-        :param trait_list: The trait list.
         :param noise_manager: The noise manager.
         :return: The list objects containing the stemmed/not stemmed features and the original traits.
         '''

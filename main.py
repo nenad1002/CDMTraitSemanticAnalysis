@@ -14,41 +14,109 @@ from validation_runner import ValidationRunner
 # otherwise specify path to the entity you want to analyze.
 ANALYZE_ATTRIBUTES_FROM_SCHEMA = True
 
+# The minimum cosine similarity when comparing attribute/traits features.
 PRECISION = 0.6
+
+# A boolean that denotes whether the program will try to find similar traits. Beware, finding similar traits
+# is dependant on the vector representation of words and can be very slow.
 DOES_PROCESS_SIMILAR_WORDS = False
 
-# Aggresive stemming preferred.
-# lancester = SnowballStemmer('english')
-lancester = LancasterStemmer()
+class MainRunner:
+
+    analyze_attributes_from_schema = True
+    precision = 0
+    does_process_similar_words = False
+
+    # The trait files.
+    trait_files = ['meanings.cdm.json', 'foundations.cdm.json', 'primitives.cdm.json']
+
+    # The trait list.
+    trait_list = []
+
+    # The stemmer used by default.
+    lancester = None
+
+    # The lemmatizer used by default.
+    wordnet_lemmatizer = None
+
+    # Managers used throughout the program.
+    noise_manager = None
+    trait_extractor = None
+    trait_analyzer = None
+
+    # The list of stemmed trait features.
+    stem_traits = []
+
+    def __init__(self, analyze_attributes_from_schema, does_process_similar_words, precision):
+        self.analyze_attributes_from_schema = analyze_attributes_from_schema
+        self.precision = precision
+        self.does_process_similar_words = does_process_similar_words
+
+        # Aggresive stemming preferred.
+        self.lancester = LancasterStemmer()
+
+        # Use wordnet for lemmas.
+        self.wordnet_lemmatizer = WordNetLemmatizer()
+
+        self.noise_manager = NoiseManager()
+        self.trait_extractor = TraitExtractor()
+        self.trait_analyzer = TraitAnalyzer()
+
+        # Extract traits from CDM Schema documents folder.
+        self.trait_list = self.trait_extractor.extract_traits('CDM.SchemaDocuments/', self.trait_files)
+
+        self.stem_traits = self.trait_analyzer.stem_traits(self.trait_list, self.lancester, self.wordnet_lemmatizer, self.noise_manager)
 
 
-# Use wordnet for lemmas.
-wordnet_lemmatizer = WordNetLemmatizer()
+    def analyze_attributes_in_entities(self, paths, trait_to_attribute_matcher, expected_traits = None):
+        '''
+        Analyzes attributes in schema document entities.
+        :param paths: The path to the entities.
+        :param trait_to_attribute_matcher: The trait to attribute matcher.
+        :param expected_traits: The expected traits to do validation.
+        :return: The list of traits.
+        '''
+        attribute_extractor = AttributeExtractor()
+        attributes = attribute_extractor.extract_attributes(paths)
 
-noise_manager = NoiseManager()
-trait_extractor = TraitExtractor()
-trait_analyzer = TraitAnalyzer()
+        attribute_name_analyzer = AttributeNameAnalyzer()
+        description_analyzer = DescriptionAnalyzer()
+        attribute_to_traits_result = {}
 
-trait_files = ['meanings.cdm.json', 'foundations.cdm.json', 'primitives.cdm.json']
+        for attribute in attributes:
+            result_traits = self.analyze_helper(attribute, attribute_name_analyzer, description_analyzer, trait_to_attribute_matcher)
 
-trait_list = trait_extractor.extract_traits('CDM.SchemaDocuments/', trait_files)
+            attribute_to_traits_result[attribute[0]] = set(result_traits)
+
+        # Run the validation runner.
+        if expected_traits is not None:
+            validation_runner = ValidationRunner()
+            example_attribute_to_trait_result = validation_runner.extract_example_data(expected_traits)
+            print("The Jaccard index of similarity for the entity/entities is", validation_runner.measure_similarity(attribute_to_traits_result, example_attribute_to_trait_result))
 
 
-stem_traits = trait_analyzer.stem_traits(lancester, wordnet_lemmatizer, trait_list, noise_manager)
+    def analyze_single_attribute(self, attribute_name, trait_to_attribute_matcher, description):
+        '''
+        Analyzes a single attribute.
+        :param attribute: The attribute name.
+        :param trait_to_attribute_matcher: The trait to attribute matcher.
+        :param description: The description.
+        :return:
+        '''
+        attribute_name_analyzer = AttributeNameAnalyzer()
+        description_analyzer = DescriptionAnalyzer()
+        attribute = [attribute_name, description]
 
+        self.analyze_helper(attribute, attribute_name_analyzer, description_analyzer, trait_to_attribute_matcher)
 
-def analyze_attributes_in_entities(trait_to_attribute_matcher, paths, expected_traits = None):
-    attribute_extractor = AttributeExtractor()
-    attribute_name_analyzer = AttributeNameAnalyzer()
-    description_analyzer = DescriptionAnalyzer()
-    attributes = attribute_extractor.extract_attributes(paths)
+    def analyze_helper(self, attribute, attribute_name_analyzer, description_analyzer, trait_to_attribute_matcher):
 
-    outputDic = {}
+        # Get the attribute features.
+        attribute_features = attribute_name_analyzer.stem_attribute(self.lancester, self.wordnet_lemmatizer, attribute)
 
-    for attribute in attributes:
-        attribute_feature = attribute_name_analyzer.stem_attribute(lancester, wordnet_lemmatizer, attribute)
+        # Check do we have a description, and if so process the description as defined.
         if attribute[1] != '':
-            sentence_features = description_analyzer.lemma_and_stem_sentence_spacy(lancester, attribute[1], False)
+            sentence_features = description_analyzer.stem_sentences(self.lancester, attribute[1], False)
         else:
             sentence_features = []
 
@@ -57,7 +125,7 @@ def analyze_attributes_in_entities(trait_to_attribute_matcher, paths, expected_t
         print(attribute[0])
         print('------- traits -------')
 
-        # We have some data
+        # We have some data.
         if (len(sentence_features) > 0):
             stemmed_sentence_features = sentence_features[0]
             unstemmed_sentence_features = sentence_features[1]
@@ -65,83 +133,41 @@ def analyze_attributes_in_entities(trait_to_attribute_matcher, paths, expected_t
             stemmed_sentence_features = []
             unstemmed_sentence_features = []
 
-        if len(attribute_feature) > 0:
-            stemmed_attribute_feature = attribute_feature[0]
-            unstemmed_attribute_feature = attribute_feature[1]
+        if len(attribute_features) > 0:
+            stemmed_attribute_feature = attribute_features[0]
+            unstemmed_attribute_feature = attribute_features[1]
 
-        # Connect attribute and sentence features and remove duplicates.
-        stemmed_features = list(dict.fromkeys(stemmed_attribute_feature + stemmed_sentence_features))
-        unstemmed_features = list(dict.fromkeys(unstemmed_attribute_feature + unstemmed_sentence_features))
-
-        # We don't want unstemmed features since similarity check could take too long. Change None to unstemmed_features
-        # if similarity check is something that is preferred to do.
-        result_trait_set_from_attribute = trait_to_attribute_matcher.match_traits_to_attribute(stemmed_attribute_feature, stem_traits, None)
-        result_trait_set_from_dict = trait_to_attribute_matcher.match_traits_to_attribute(stemmed_sentence_features, stem_traits, None)
+        result_trait_set_from_attribute = trait_to_attribute_matcher.match_traits_to_attribute(
+            stemmed_attribute_feature, self.stem_traits, unstemmed_attribute_feature)
+        result_trait_set_from_dict = trait_to_attribute_matcher.match_traits_to_attribute(stemmed_sentence_features,
+                                                                                          self.stem_traits,
+                                                                                          unstemmed_sentence_features)
 
         result_traits = nlp_utility.define_proper_order(result_trait_set_from_attribute, result_trait_set_from_dict)
         print(result_traits)
-        print ('----------------')
-        print ()
+        print('----------------')
+        print()
 
-        outputDic[attribute[0]] = set(result_traits)
+        return result_traits
 
-    if expected_traits is not None:
-        validation_runner = ValidationRunner()
-        benchmark_dict = validation_runner.extract_example_data(expected_traits)
-        print("The Jaccard index of similarity for this example is", validation_runner.measure_similarity(outputDic, benchmark_dict))
+    def run(self):
 
-def analyze_single_attribute(trait_to_attribute_matcher, attribute, description):
-    attribute_name_analyzer = AttributeNameAnalyzer()
-    description_analyzer = DescriptionAnalyzer()
-    attribute = [attribute, description]
-    attribute_feature = attribute_name_analyzer.stem_attribute(lancester, wordnet_lemmatizer, attribute)
-    if description != '':
-        sentence_features = description_analyzer.lemma_and_stem_sentence_spacy(lancester, attribute[1], False)
-    else:
-        sentence_features = []
+        trait_to_attribute_matcher = TraitToAttributeMatcher(self.does_process_similar_words, self.precision)
 
-    if (len(sentence_features) > 0):
-        stemmed_sentence_features = sentence_features[0]
-        unstemmed_sentence_features = sentence_features[1]
-    else:
-        stemmed_sentence_features = []
-        unstemmed_sentence_features = []
+        while True:
+            from_schema = input("Analyze from schema (True/False)? ")
+            self.analyze_attributes_from_schema = True if from_schema == 'True' else False
 
-    if len(attribute_feature) > 0:
-        stemmed_attribute_feature = attribute_feature[0]
-        unstemmed_attribute_feature = attribute_feature[1]
+            if self.analyze_attributes_from_schema:
+                self.analyze_attributes_in_entities(['CDM.SchemaDocuments/core/applicationCommon/Account.cdm.json'], trait_to_attribute_matcher, 'handwritten-examples/Account.trait.json')
+            else:
+                while (True):
+                    attribute = input("Enter attribute name: ")
+                    description = input("Enter description: ")
 
-    print()
-    print("------- attribute ------")
-    print(attribute[0])
-    print('------- traits -----------')
+                    self.analyze_single_attribute(attribute, trait_to_attribute_matcher, description)
 
-    result_trait_set_from_attributes = trait_to_attribute_matcher.match_traits_to_attribute(stemmed_attribute_feature, stem_traits,
-                                                                            None)
-    result_trait_set_from_desc = trait_to_attribute_matcher.match_traits_to_attribute(stemmed_sentence_features, stem_traits, None)
-
-    result_traits = nlp_utility.define_proper_order(result_trait_set_from_attributes, result_trait_set_from_desc)
-    print (result_traits)
-
-    #print (result_trait_set_from_desc)
-
-    #result_trait_set_from_attributes = trait_to_attribute_matcher.match_traits_to_attribute(stem_feature, stem_traits)
-    #result_trait_set_from_desc = trait_to_attribute_matcher.match_traits_to_attribute(stem_feature, stem_traits)
-    #print (list(dict.fromkeys(result_trait_set_from_attributes + result_trait_set_from_desc)))
-    print ('-------------')
-    print ()
-
-def main(whetherToAnalyzeSchema):
-
-    trait_to_attribute_matcher = TraitToAttributeMatcher(DOES_PROCESS_SIMILAR_WORDS, PRECISION)
-
-    if whetherToAnalyzeSchema:
-        analyze_attributes_in_entities(trait_to_attribute_matcher, ['CDM.SchemaDocuments/core/applicationCommon/Account.cdm.json'], 'handwritten-examples/Account.trait.json')
-    else:
-        while (True):
-            attribute = input("Enter attribute name: ")
-            description = input("Enter description: ")
-            analyze_single_attribute(trait_to_attribute_matcher, attribute, description)
 
 if __name__ == "__main__":
-    main(ANALYZE_ATTRIBUTES_FROM_SCHEMA)
+    main_runner = MainRunner(ANALYZE_ATTRIBUTES_FROM_SCHEMA, DOES_PROCESS_SIMILAR_WORDS, PRECISION)
+    main_runner.run()
