@@ -1,6 +1,6 @@
 import spacy
 
-nlp = spacy.load("en_core_web_md")
+nlp = spacy.load("en_core_web_sm")
 
 def match_traits_to_attribute(attribute_features, trait_features, non_stemmed_features):
     result_trait_list = []

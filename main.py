@@ -10,6 +10,9 @@ import trait_analyzer
 import attribute_name_analyzer
 import spacy
 import trait_to_attribute_matcher
+from noise_manager import NoiseManager
+from trait_extractor import TraitExtractor
+from trait_analyzer import TraitAnalyzer
 
 # Change this to false if you want to analyze a single attribute,
 # otherwise specify path to the entity you want to analyze.
@@ -23,12 +26,16 @@ lancester = LancasterStemmer()
 # Use wordnet for lemmas.
 wordnet_lemmatizer = WordNetLemmatizer()
 
+noise_manager = NoiseManager()
+trait_extractor = TraitExtractor()
+trait_analyzer = TraitAnalyzer()
 
 trait_files = ['meanings.cdm.json', 'foundations.cdm.json', 'primitives.cdm.json']
 
 trait_list = trait_extractor.extract_traits('CDM.SchemaDocuments/', trait_files)
 
-stem_traits = trait_analyzer.lemma_and_stem_traits(lancester, wordnet_lemmatizer, trait_list)
+
+stem_traits = trait_analyzer.lemma_and_stem_traits(lancester, wordnet_lemmatizer, trait_list, noise_manager)
 
 
 def analyze_attributes_in_entities(paths, expected_traits = None):

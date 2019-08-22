@@ -3,7 +3,7 @@ from nltk import pos_tag
 import nlp_utility
 import spacy
 
-nlp = spacy.load("en_core_web_md")
+nlp = spacy.load("en_core_web_sm")
 
 # Deprecated, use Spacy method instead for both increased precision and speed.
 def lemma_and_stem_sentence(stemmer, sent):
