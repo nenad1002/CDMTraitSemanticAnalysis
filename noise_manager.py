@@ -21,8 +21,11 @@ class NoiseManager:
 
 
     def generate_commonly_occured_noise(self, traits):
-        '''Finds and generates trait features which might be
+        '''
+        Finds and generates trait features which might be
         too noisy and not really useful for classification.
+        :param traits: The list of existing traits.
+        :return: The noisy traits.
         '''
 
         # TODO: Find a way to remove trait features that might only appear once.

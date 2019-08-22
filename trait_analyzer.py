@@ -1,5 +1,4 @@
 from nltk.tokenize import RegexpTokenizer
-import nlp_utility
 
 class TraitAnalyzer:
     '''The class that does preprocessing on the traits to ensure all features are properly extracted by
@@ -25,7 +24,15 @@ class TraitAnalyzer:
     #        return result
 
 
-    def lemma_and_stem_traits(self, stemmer, lemmatizer, trait_list, noise_manager):
+    def stem_traits(self, stemmer, lemmatizer, trait_list, noise_manager):
+        '''
+        It does stemming on the traits features.
+        :param stemmer: The stemmer.
+        :param lemmatizer: The lemmatizer, a user can optionally add code which uses lemmatizer.
+        :param trait_list: The trait list.
+        :param noise_manager: The noise manager.
+        :return: The list objects containing the stemmed/not stemmed features and the original traits.
+        '''
         result = []
 
         # Find trait features which might produce too much noise.

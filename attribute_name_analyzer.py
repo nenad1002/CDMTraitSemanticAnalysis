@@ -1,19 +1,33 @@
 import nlp_utility
 from nltk.tokenize import RegexpTokenizer
 
+class AttributeNameAnalyzer:
 
-camel_case_tokenizer = RegexpTokenizer('([A-Z]?[a-z]+)')
+    camel_case_tokenizer = None
+
+    def __init__(self):
+        self.camel_case_tokenizer = RegexpTokenizer('([A-Z]?[a-z]+)')
 
 
-def lemma_and_stem_attribute(stemmer, lemmatizer, attribute):
-    features_list = camel_case_tokenizer.tokenize(attribute[0])
-    features_list = nlp_utility.convert_to_lower_case(features_list)
-    feature_words = nlp_utility.remove_stop_words(features_list)
+    def stem_attribute(self, stemmer, lemmatizer, attribute):
+        '''
+        Does stemming of the attributes.
+        :param stemmer: The stemmer.
+        :param lemmatizer: The lemmatizer, it is not used, but optionally it can be turned on by a user.
+        :param attribute: The attribute.
+        :return: The list of stemmed/non-stemmed feature pairs.
+        '''
 
-    result = []
-    for word in feature_words:
-        #lemma = lemmatizer.lemmatize(word)
-        stem = stemmer.stem(word)
-        result.append(stem)
+        # First tokenize the attribute.
+        features_list = self.camel_case_tokenizer.tokenize(attribute[0])
+        features_list = nlp_utility.convert_to_lower_case(features_list)
 
-    return result, feature_words
+        # Remove the user defined stop words.
+        feature_words = nlp_utility.remove_stop_words(features_list)
+
+        result = []
+        for word in feature_words:
+            stem = stemmer.stem(word)
+            result.append(stem)
+
+        return result, feature_words
