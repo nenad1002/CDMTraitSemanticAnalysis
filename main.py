@@ -9,6 +9,7 @@ from trait_to_attribute_matcher import TraitToAttributeMatcher
 from attribute_extractor import AttributeExtractor
 from attribute_name_analyzer import AttributeNameAnalyzer
 from validation_runner import ValidationRunner
+import spacy
 
 # Change this to false if you want to analyze a single attribute,
 # otherwise specify path to the entity you want to analyze.
@@ -47,7 +48,12 @@ class MainRunner:
     # The list of stemmed trait features.
     stem_traits = []
 
+    # The NLP corpus from Spacy.
+    nlp_corpus = None
+
     def __init__(self, analyze_attributes_from_schema, does_process_similar_words, precision):
+        # Load medium or big corpus of english words.
+        self.nlp_corpus = spacy.load("en_core_web_md")
         self.analyze_attributes_from_schema = analyze_attributes_from_schema
         self.precision = precision
         self.does_process_similar_words = does_process_similar_words
@@ -80,7 +86,7 @@ class MainRunner:
         attributes = attribute_extractor.extract_attributes(paths)
 
         attribute_name_analyzer = AttributeNameAnalyzer()
-        description_analyzer = DescriptionAnalyzer()
+        description_analyzer = DescriptionAnalyzer(self.nlp_corpus)
         attribute_to_traits_result = {}
 
         for attribute in attributes:
@@ -104,7 +110,7 @@ class MainRunner:
         :return:
         '''
         attribute_name_analyzer = AttributeNameAnalyzer()
-        description_analyzer = DescriptionAnalyzer()
+        description_analyzer = DescriptionAnalyzer(self.nlp_corpus)
         attribute = [attribute_name, description]
 
         self.analyze_helper(attribute, attribute_name_analyzer, description_analyzer, trait_to_attribute_matcher)
@@ -152,7 +158,7 @@ class MainRunner:
 
     def run(self):
 
-        trait_to_attribute_matcher = TraitToAttributeMatcher(self.does_process_similar_words, self.precision)
+        trait_to_attribute_matcher = TraitToAttributeMatcher(self.does_process_similar_words, self.precision, self.nlp_corpus)
 
         while True:
             from_schema = input("Analyze from schema (True/False)? ")
@@ -161,11 +167,10 @@ class MainRunner:
             if self.analyze_attributes_from_schema:
                 self.analyze_attributes_in_entities(['CDM.SchemaDocuments/core/applicationCommon/Account.cdm.json'], trait_to_attribute_matcher, 'handwritten-examples/Account.trait.json')
             else:
-                while (True):
-                    attribute = input("Enter attribute name: ")
-                    description = input("Enter description: ")
+                attribute = input("Enter attribute name: ")
+                description = input("Enter description: ")
 
-                    self.analyze_single_attribute(attribute, trait_to_attribute_matcher, description)
+                self.analyze_single_attribute(attribute, trait_to_attribute_matcher, description)
 
 
 if __name__ == "__main__":

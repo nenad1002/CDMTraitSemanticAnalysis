@@ -8,7 +8,7 @@ class TraitToAttributeMatcher:
 
     precision = 0
 
-    def __init__(self, is_similar_word_processing=False, precision = 0):
+    def __init__(self, is_similar_word_processing=False, precision = 0, nlp = None):
         '''
         Creates a new instance of TraitToAttributeMatcher.
         :param is_similar_word_processing: The flag that denotes whether we want to use the vector based similariy search.
@@ -16,8 +16,7 @@ class TraitToAttributeMatcher:
         '''
         self.is_similar_word_processing = is_similar_word_processing
         if is_similar_word_processing:
-            # Load medium or big corpus of english words.
-            self.nlp = spacy.load("en_core_web_sm")
+            self.nlp = nlp
             self.precision = precision
 
     def match_traits_to_attribute(self, attribute_features, trait_features, non_stemmed_features=None):

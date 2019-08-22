@@ -1,5 +1,4 @@
 import nlp_utility
-import spacy
 
 
 class DescriptionAnalyzer:
@@ -10,9 +9,8 @@ class DescriptionAnalyzer:
     nlp = None
 
 
-    def __init__(self):
-        self.nlp = spacy.load("en_core_web_sm")
-
+    def __init__(self, nlp):
+        self.nlp = nlp
 
     def stem_sentences(self, stemmer, sent, is_noise_preferred):
 
