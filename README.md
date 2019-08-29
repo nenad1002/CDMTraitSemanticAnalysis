@@ -21,4 +21,4 @@ Example:
 
 As it is clear from the proposed set of traits, the analyzer will try to find appropriate features inside the description while ignoring the ones that are not important to find the correct traits.
 
-TODO: Some basic refactoring and removing static properties has to be done, feel free make a PR fixing the issues or wait until 9/7/2019 to get it fixed.
+TODO: Some basic refactoring and removing static properties from the classes has to be done, feel free to make a PR fixing the issues or wait until 9/7/2019 to have it fixed.
