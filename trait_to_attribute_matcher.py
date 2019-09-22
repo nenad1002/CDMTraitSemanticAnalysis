@@ -2,11 +2,7 @@ import spacy
 
 
 class TraitToAttributeMatcher:
-    nlp = None
-
     is_similar_word_processing = False  # Type: boolean
-
-    precision = 0
 
     def __init__(self, is_similar_word_processing=False, precision = 0, nlp = None):
         '''

@@ -25,31 +25,10 @@ DOES_PROCESS_SIMILAR_WORDS = False
 class MainRunner:
 
     analyze_attributes_from_schema = True
-    precision = 0
     does_process_similar_words = False
 
     # The trait files.
     trait_files = ['meanings.cdm.json', 'foundations.cdm.json', 'primitives.cdm.json']
-
-    # The trait list.
-    trait_list = []
-
-    # The stemmer used by default.
-    lancester = None
-
-    # The lemmatizer used by default.
-    wordnet_lemmatizer = None
-
-    # Managers used throughout the program.
-    noise_manager = None
-    trait_extractor = None
-    trait_analyzer = None
-
-    # The list of stemmed trait features.
-    stem_traits = []
-
-    # The NLP corpus from Spacy.
-    nlp_corpus = None
 
     def __init__(self, analyze_attributes_from_schema, does_process_similar_words, precision):
         # Load medium or big corpus of english words.
@@ -64,6 +43,7 @@ class MainRunner:
         # Use wordnet for lemmas.
         self.wordnet_lemmatizer = WordNetLemmatizer()
 
+        # Managers used throughout the program.
         self.noise_manager = NoiseManager()
         self.trait_extractor = TraitExtractor()
         self.trait_analyzer = TraitAnalyzer()
@@ -71,6 +51,7 @@ class MainRunner:
         # Extract traits from CDM Schema documents folder.
         self.trait_list = self.trait_extractor.extract_traits('CDM.SchemaDocuments/', self.trait_files)
 
+        # The list of stemmed trait features.
         self.stem_traits = self.trait_analyzer.stem_traits(self.trait_list, self.lancester, self.wordnet_lemmatizer, self.noise_manager)
 
 

@@ -5,8 +5,6 @@ class TraitAnalyzer:
     doing stemming, optional lemming and removing noisy features.
     '''
 
-    camel_case_tokenizer = None
-
     def __init__(self):
         # Needed to be able to tokenize traits that have multiple words in a feature.
         camel_case_tokenizer = RegexpTokenizer('([A-Z]?[a-z]+)')

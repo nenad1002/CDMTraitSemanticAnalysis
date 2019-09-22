@@ -2,9 +2,6 @@ import nlp_utility
 from nltk.tokenize import RegexpTokenizer
 
 class AttributeNameAnalyzer:
-
-    camel_case_tokenizer = None
-
     def __init__(self):
         self.camel_case_tokenizer = RegexpTokenizer('([A-Z]?[a-z]+)')
 

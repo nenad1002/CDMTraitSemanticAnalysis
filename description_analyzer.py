@@ -6,9 +6,6 @@ class DescriptionAnalyzer:
     The class that deals with analyzing an attribute's descrption.
     '''
 
-    nlp = None
-
-
     def __init__(self, nlp):
         self.nlp = nlp
 
@@ -70,8 +67,8 @@ class DescriptionAnalyzer:
         if len(subjects) == 0 and len(objects) == 0:
             return self.find_all_nouns(doc)
 
-        print (subjects)
-        print (objects)
+        #print (subjects)
+        #print (objects)
         return subjects if len(subjects) != 0 else objects
 
 
